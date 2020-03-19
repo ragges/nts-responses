@@ -1,0 +1,765 @@
+
+Hello Benjamin,
+
+Thank you very much for your thorough review and all your comments!
+This has helped us improve on the text in many places.
+
+Please find our answers below.
+
+> On 11 Mar 2020, at 01:22, Benjamin Kaduk via Datatracker <noreply@ietf.org> wrote:
+> 
+> Benjamin Kaduk has entered the following ballot position for
+> draft-ietf-ntp-using-nts-for-ntp-23: Discuss
+> 
+> When responding, please keep the subject line intact and reply to all
+> email addresses included in the To and CC lines. (Feel free to cut this
+> introductory paragraph, however.)
+> 
+> 
+> Please refer to https://www.ietf.org/iesg/statement/discuss-criteria.html
+> for more information about IESG DISCUSS and COMMENT positions.
+> 
+> 
+> The document, along with other ballot positions, can be found here:
+> https://datatracker.ietf.org/doc/draft-ietf-ntp-using-nts-for-ntp/
+> 
+> 
+> 
+> ----------------------------------------------------------------------
+> DISCUSS:
+> ----------------------------------------------------------------------
+> 
+> Thank you for this document; it has been a long time coming and is much
+> awaited.  That said, I have a few points I'd like to discuss before I
+> can comfortably ballot Yes:
+> 
+> I'm happy to see prominent references to RFCs 7525 and 6125.
+> Unfortunately, merely citing RFC 6125 does not provide a usable
+> specification for an application to implement; we need to additionally
+> state what type of name (e.g., SRV-ID or DNS-ID) is used as input to the
+> validation process and how the application obtains that name.  Given
+> that we are defining a service name (and port number) for ntske, SRV-ID
+> might be appropriate (DNS-ID is the most common form I see consumers
+> of RFC 6125 using).
+
+The service discovery is not in scope for this draft, and we anticipate
+several different methods in the future. There are already discussions
+going on on the ntp mailing list.
+We therefore do not specify these things here, but want to refer to
+the relevant specifications for the different methods.
+
+> In a related vein, if ALPN is necessary for confirming ntske operation,
+> it's not entirely clear to me that a dedicated port (in addition to
+> service name) is required, and RFC 6335 discourages fixed port numbera
+> llocations.  Perhaps it's not intended that DNS-SD is used to discover
+> NTS-KE servers, though -- there's no reference to RFC 6763 in this
+> document, or other discussion of server discovery that I can see.
+
+Again, we anticipate several different methods.
+
+> We seem to be internally inconsistent about whether the Cookie extension
+> can be encrypted -- Section 5.7 says "MUST NOT be encrypted", but
+> Section 5.2 implies that it could be encrypted:
+> 
+>  Always included among the authenticated or authenticated-and-
+>  encrypted extension fields are a cookie extension field and a unique
+>  identifier extension field.  [...]
+
+The cookie is not encrypted from client to server (since the server
+does not yet know what C2S key to use, it is in the cookie), but
+encrypted when sent from the server to the client, for unlinkability.
+The text was a bit confusing, we added a reference to clear this up.
+
+> Section 7.6 says that applications for new record types need to specify
+> the contents of the "Set Critical Bit" field, but this field is not
+> included in the table of initial entries.  Additionally, there doesn't
+> seem to be a clear description of what the semantics of the "Set
+> Critical Bit" field should be.
+
+Thanks - there used to be a Critical bit in the registry, but as you
+saw is not any more. It now removed from the text too.
+
+> ----------------------------------------------------------------------
+> COMMENT:
+> ----------------------------------------------------------------------
+> 
+> Section 1.1
+> 
+>  o  Identity: Through the use of the X.509 public key infrastructure,
+> 
+> It's not exactly accurate to say that there's one privileged "X.509 PKI"
+> (even if that would have been true about the original X.500 vision); we
+> have a large set of stuff on the "Web PKI" but there are other
+> X.509-based PKIs in use in, e.g., the cable industry.  I'd suggest
+> either dropping "the" or (if appropriate, which is not entirely clear)
+> adding "Web".
+
+Indeed, fixed!
+
+>  o  Replay prevention: Client implementations may detect when a
+>     received time synchronization packet is a replay of a previous
+>     packet.
+> 
+> Given that a replay of time synchronization information kind of defeats
+> the point of a time synchronization protocol, do we want to use
+> something stronger than "may" here?
+
+The reasoning behind this was that the protocol allows for this,
+but can not guarantee that an implementation does what it is
+supposed to do.
+
+>  o  Unlinkability: For mobile clients, NTS will not leak any
+>     information additional to NTP which would permit a passive
+>     adversary to determine that two packets sent over different
+>     networks came from the same client.
+> 
+> I guess it's kind of implicit that server mobility isn't really a thing
+> and thus we don't need to be concerned about linkability of servers.
+
+We think so too.
+
+>  o  Non-amplification: Implementations (especially server
+>     implementations) may avoid acting as distributed denial-of-service
+>     (DDoS) amplifiers by never responding to a request with a packet
+>     larger than the request packet.
+> 
+> [similar comment about "may"]
+
+(See answer above.)
+
+> Section 1.2
+> 
+>  The typical protocol flow is as follows: The client connects to an
+>  NTS-KE server on the NTS TCP port and the two parties perform a TLS
+> 
+> (Section 7.1 requests a port for "ntske"; I don't know how tightly we
+> need to constrain descriptive usage like this.)
+
+It says "typical", so our feeling is that this is ok.
+
+>  handshake.  Via the TLS channel, the parties negotiate some
+>  additional protocol parameters and the server sends the client a
+>  supply of cookies along with an IP address to the NTP server for
+>  which the cookies are valid.  The parties use TLS key export
+> 
+> nit: "IP address of the NTP server"
+
+Fixed!
+
+>  phase of the protocol.  This negotiation takes only a single round
+>  trip, after which the server closes the connection and discards all
+>  associated state.  At this point the NTS-KE phase of the protocol is
+> 
+> nit(?): I'm not sure if there's a preference between "only takes a single
+> round trip" and "consists of a single request/response exchange".
+
+We neither, so we decided to let it be (there are a lot of last
+minute changes anyway).
+
+>  Figure 1 provides an overview of the high-level interaction between
+>  the client, the NTS-KE server, and the NTP server.  Note that the
+>  cookies' data format and the exchange of secrets between NTS-KE and
+>  NTP servers are not part of this specification and are implementation
+>  dependent.  However, a suggested format for NTS cookies is provided
+>  in Section 6.
+> 
+> This is analogous to the RFC 5077 treatment of TLS session tickets that
+> gives a "recommended" construction; however, while RFC 8446 to some
+> extent supersedes RFC 5077's specification, 8446 specifically does not
+> give a "recommended" construction, since there's not a whole lot that
+> specifically needs to be recommended.  I wonder if it would be better to
+> discuss this as an "example" construction rather than a "recommended"
+> one.
+
+We could not see a big advantage of changing it, it would have to be
+changed in several places, so we let it be.
+
+> Section 3
+> 
+>  Since the NTS protocol is new as of this publication, no backward-
+>  compatibility concerns exist to justify using obsolete, insecure, or
+>  otherwise broken TLS features or versions.  Implementations MUST
+> 
+> So we can mandate TLS 1.3?
+> (Among other things, this would also obviate any need to worry about
+> requiring extended master secret before using the TLS Exporter
+> interface.)
+
+This has been debated back and forth several times, and the last time
+it was still an argument that there were a lot of installations that
+would have had troubles supporting TLS 1.3, so demanding 1.3 would
+have slowed down the adoption rate.
+
+>  conform with [RFC7525] or with a later revision of BCP 195.  In
+>  particular, failure to use cipher suites that provide forward secrecy
+>  will make all negotiated NTS keys recoverable by anyone that gains
+>  access to the NTS-KE server's private key.  Furthermore:
+> 
+> So forward secret ciphersuites are REQUIRED?
+
+### XXX ###
+Issue #97
+### XXX ###
+
+> Section 4
+> 
+> Is there any significance to the ordering of records within a message
+> (other than End of Message)?
+
+Short answer: No.
+
+>  The NTS key establishment protocol is conducted via TCP port
+>  [[TBD1]].  The two endpoints carry out a TLS handshake in conformance
+> 
+> [See discuss point about server discovery]
+> 
+>  in the TLS-protected channel.  Then, the server SHALL send a single
+>  response followed by a TLS "Close notify" alert and then discard the
+>  channel state.
+> 
+> [side note: since we define NTS-KE to be the single request/response
+> pair and the response is self-framing, the close_notify is kind of
+> redundant.  Which is not to say that it's bad to talk about, though it
+> does make one wonder why we only say the server sends it and don't have
+> the client also send one in response.  (Note that RFC 8446 has "Each
+> party MUST send a "close_notify" alert before closing its write side of
+> the connection, unless it has already sent some error alert.")]
+
+### XXX ###
+We like to refer to the TLS RFC:s for those details.
+(Does not address: ... though it does make one wonder why we only say the server ...
+Issue #99
+### XXX ###
+
+> While the prospect of a reflection attack seens unlikely (would a
+> machine be acting as both NTS-KE client and server?), it may be worth
+> introducing some marker of whether a record is being sent by a client
+> vs. a server.
+
+We don't really see how that attack would work.
+
+Yes, a machine could be both a NTS-KE client and server, for example an
+NTS enabled stratum 2 server box. With bad configuration, it could
+potentially use itself as a server, including negotiating cookies
+and keys for itself, just as can be done with an NTP server today
+(but if nothing else the NTP stratum mechanism should make that
+time link useless).
+
+>  For clarity regarding bit-endianness: the Critical Bit is the most-
+>  significant bit of the first octet.  In C, given a network buffer
+>  `unsigned char b[]` containing an NTS-KE record, the critical bit is
+>  `b[0] >> 7` while the record type is `((b[0] & 0x7f) << 8) + b[1]`.
+> 
+> When people use C syntax for examples we tend to ask for a reference or
+> at least indication of a language version, though I can't imaging this
+> particular aspect changing in a future version of C...
+
+### XXX ###
+(We have not given a version, really...)
+Issue #101
+### XXX ###
+
+> Please mention somewhere that the angle brackets in Figure 3 are used to
+> denote optional records.
+
+We could not figure out a reasonable way to fix this to make it
+entirely right, and it is meant just an illustration to the text
+which has the details.
+
+> Section 4.1.2
+> 
+> Just to check: because of the "close_notify" requirement, any future
+> "Next Protocol" is going to only be using the key material established
+> through this NTS-KE session, but cannot be using this TLS connection
+> (akin to STARTTILS ... or should I say STARTNTS?).
+
+Correct, the protocol that uses the key material will not use this
+TLS connection.
+
+> Section 4.1.3
+> 
+> What do I do if I get an Error record without the critical bit set?
+> Treat it as ... an error?
+
+The critical bit should only be checked if the receiver does not
+recognise the record id, see Section 4, page 9 of the draft.
+
+> Section 4.1.5
+> 
+> The AEAD Algorithms registry just gives a listing of "raw" ciphers; do
+> we expect there to be a need for additional specifications that cover
+> how to integrate the AEAD cipher into a given NTS Next Protocol?
+> (Obviously this document does so for NTPv4.)
+> 
+>  If the NTS Next Protocol Negotiation record offers Protocol ID 0 (for
+>  NTPv4), then this record MUST be included exactly once.  Other
+>  protocols MAY require it as well.
+> 
+> (This seems to in practice force any future NPN protocols to not try to
+> define semantics for including AEAD Algorithm Negotiation more than once
+> ... which is probably fine.)
+
+Yes, that is pretty much the expectation, though details from the
+NTP next protocol may be reused.
+
+> Section 4.1.7
+> 
+>  The NTPv4 Server Negotiation record has a Record Type number of 6.
+>  Its body consists of an ASCII-encoded [ANSI.X3-4.1986] string.  The
+> 
+> Is the ANSI ref preferred over RFC 20?
+
+No, it is now changed to RFC 20.
+
+>  contents of the string SHALL be either an IPv4 address, an IPv6
+>  address, or a fully qualified domain name (FQDN).  IPv4 addresses
+> 
+> I note that up in Section 1.2 we just said that the NTS-KE server sends
+> "an IP address to [sic] the NTP server for which the cookies are valid",
+> which is internally inconsistent.
+
+Right, fixed with a small change of the text.
+
+>  [RFC4291] and MUST NOT include zone identifiers [RFC6874].  If a
+>  label contains at least one non-ASCII character, an A-LABEL MUST be
+>  used as defined in section 2.3.2.1 of RFC 5890 [RFC5890].
+> 
+> It's probably implicit, but this of course only applies in the "FQDN"
+> case, and the previous sentences were talking about the IP-address
+> cases...
+
+You are right. We have updated this to get it more explicit.
+
+>     The disambiguating label string MUST be "EXPORTER-network-time-
+>     security/1".
+> 
+> I guess it's a matter of taste (though maybe we had some IAB guidance?),
+> but the version suffix "/1" may not be needed.
+
+We intend this to be a version number, should it ever be needed.
+
+> Section 5.1
+> 
+> My instincts are telling me to try to include, e.g., the TLS SNI value
+> and the NTPv4 Server/Port negotiation results in the exporter input, but
+> I think that is not actually needed (the TLS handshake transcript
+> protects the SNI value and the TLS connection itself protects the
+> others).
+
+Indeed, this should be handled by the TLS layer.
+
+> Section 5.2
+> 
+>  field is to enable the server to offload storage of session state
+>  onto the client.  The purpose of the unique identifier extension
+>  field is to protect the client from replay attacks.
+> 
+> Just to check: this is a "unique identifier" of the NTP packet (i.e., a
+> nonce), not a "unique identifier" of the client or some other persistent
+> entity?
+
+Yes. It is all described in the following section (5.3).
+
+> Section 5.5
+> 
+> It's probably worth mentioning here that the Cookie Placeholder is
+> allowed to appear multiple times (Section 5.7 gives the recommended
+> procedure for doing so).
+> (Interestingly, the TLS WG is currently discussing a TLS extension to
+> allow a client to request a specific number of cookies on a given
+> handshake, which RFC 8446 left entirely to the server's discretion.)
+> [As another side note, this "single-use cookie with a new one returned
+> on each exchange" mechanism reminds me a lot of the ACME nonce usage,
+> though ACME places the burden of single-use on the server whereas for
+> NTS the client can enforce or choose to not enforce single-use.]
+
+### XXX ###
+This is deliberate.
+(This does not mention that the placeholder is allowed to appear multiple times.)
+Issue #112
+### XXX ###
+
+>  prevent DDoS amplification.  The contents of the NTS Cookie
+>  Placeholder extension field's body are undefined and, aside from
+>  checking its length, MUST be ignored by the server.
+> 
+> It seems like whenever we leave something's contents undefined, some
+> clever person in the future is going to want to repurpose it for
+> something...if we require it to be all-zeros (or some other value) for
+> now, such future extensions can be more reliable.
+
+Good point, we have now changed it to "SHOULD be all zeros".
+(It also avoids sending data from uninitialised buffers.)
+
+> Section 5.6
+> 
+>  not exceed the length of the request.  For mode 4 (server) packets,
+>  no Additional Padding field is ever required.  For mode 3 (client)
+> 
+> nit: s/ever/never/
+
+Here it actually should be "ever".
+
+>  Senders are always free to include more Additional Padding than
+>  mandated by the above paragraph.  Theoretically, it could be
+> 
+> Is there a practical upper bound on how much padding could be included?
+> Would we expect servers to discard packets with "too much" additional
+> padding?
+
+It will be limited by the maximum UDP packet size. We can't see any
+reason to put any upper boundaries on the padding, since having more
+than necessary will mainly harm the sender, and the harm to the
+receiver (e.g. filling packet reassembly buffers) could likely be
+accomplished anyway with or without padding.
+
+> Section 5.7
+> 
+>     Exactly one Unique Identifier extension field which MUST be
+>     authenticated, MUST NOT be encrypted, and whose contents MUST NOT
+>     duplicate those of any previous request.
+> 
+> What's the scope of the "MUST NOT duplicate"?  Per C2S key?  Per client?
+
+Text updated to clarify this.
+
+>     and MUST NOT be encrypted.  The cookie MUST be one which has been
+>     previously provided to the client; either from the key exchange
+>     server during the NTS-KE handshake or from the NTP server in
+>     response to a previous NTS-protected NTP request.
+> 
+> nit: comma instead of semicolon (the second half is not a complete
+> sentence).
+
+Fixed.
+
+>  preference.  Section 10.1 describes the privacy considerations of
+>  this in further detail.
+> 
+> nit(?): maybe "this tradeoff"?
+
+It may not be a "tradeoff" in all situations, so we let it be.
+
+>  fields which MUST be authenticated and MAY be encrypted.  The number
+>  of NTS Cookie Placeholder extension fields that the client includes
+>  SHOULD be such that if the client includes N placeholders and the
+>  server sends back N+1 cookies, the number of unused cookies stored by
+>  the client will come to eight.  The client SHOULD NOT include more
+>  than seven NTS Cookie Placeholder extension fields in a request.
+>  When both the client and server adhere to all cookie-management
+>  guidance provided in this memo, the number of placeholder extension
+>  fields will equal the number of dropped packets since the last
+>  successful volley.
+> 
+> Choosing the number of Cooke Placeholders to include in this way can
+> introduce a side channel of information for (essentially) the amount of
+> packet loss the client is observing.  In the interest of reducing the
+> number of side channels available, perhaps we should give some positive
+> guidance to prefer encrypting the placeholders rather than leaving them
+> authenticated but unencrypted?
+
+The number of cookie placeholders can be seen from the packet size
+anyway, so there is no real gain in hiding them.
+
+>  1280 octets if no non-NTS-related extensions are used; 1280 octets is
+>  the minimum prescribed MTU for IPv6 and is in practice also safe for
+>  avoiding IPv4 fragmentation.  Nonetheless, senders SHOULD include
+> 
+> (If I held the pen this would be "generally safe", but I do not have
+> specific grounds to object to this phrasing.)
+
+That is better, changed.
+
+> I know that RFC 5116 discusses AEAD decryption as producing either
+> plaintext or FAIL, but when Figure 5 has the server merely "verify time
+> request message", should we be saying anything about "decrypt encrypted
+> extension fields EF" as well?  [Similarly for the client's "verify time
+> response message".]
+
+We saw little gain in adding more text to the figure, so we didn't.
+
+>  present.  Servers MAY implement exceptions to this requirement for
+>  particular extension fields if their specification explicitly
+>  provides for such.
+> 
+> [the specification of the server or the specification of the extension
+> field?]
+
+The specification of the extension field.
+
+>  Upon receiving an NTS-protected request, the server SHALL (through
+>  some implementation-defined mechanism) use the cookie to recover the
+>  AEAD Algorithm, C2S key, and S2C key associated with the request, and
+>  then use the C2S key to authenticate the packet and decrypt the
+>  ciphertext.  If the cookie is valid and authentication and decryption
+>  succeed, the server SHALL include the following extension fields in
+>  its response:
+> 
+> [This is not consistent with the RFC 5116 AEAD terminology, though it's
+> hard to make a strong case that it needs to be.]
+
+We believe it is clear enough as it is.
+
+>  The server MAY include additional (non-NTS-related) extension fields
+>  which MAY appear prior to the NTS Authenticator and Encrypted
+>  Extension Fields extension field (therefore authenticated but not
+>  encrypted), within it (therefore encrypted and authenticated), or
+>  after it (therefore neither encrypted nor authenticated).  In
+>  general, however, the client MUST discard any unauthenticated
+>  extension fields and process the packet as though they were not
+>  present.  Clients MAY implement exceptions to this requirement for
+>  particular extension fields if their specification explicitly
+>  provides for such.
+> 
+> [same as for the other direction]
+
+(Same answer here.)
+
+>  If the NTP server has previously responded with authentic NTS-
+>  protected NTP packets (i.e., packets containing the NTS Authenticator
+>  and Encrypted Extension Fields extension field), the client MUST
+> 
+> I do see "authentic" outside the parenthetical, but still wonder if
+> "authentic" or "properly validated" or something should also appear
+> within the parenthetical.
+
+Right, the parenthesis is now removed.
+
+>  protocol upon forced disassociation from an NTP server.  In that
+>  case, it MUST be able to detect and stop looping between the NTS-KE
+>  and NTP servers by rate limiting the retries using e.g. exponential
+>  retry intervals.
+> 
+> [I frequently express a desire to see the base of the exponent indicated
+> when "exponential retry intervals" are specified, though it does not
+> seem mandatory for correcness of operation here.]
+
+Here, exponential is just an example, it may be dependant on the
+application, e.g. something with very low available bandwidth
+and/or low time dependancy may not want to waste cycles on this,
+and the exact rate limiting methods and constants may need to change 
+hen we get more knowledge or other external circumstances change.
+
+> Section 6
+> 
+>  nonce reuse.  It need not be the same as the one that was negotiated
+>  with the client.  Servers should randomly generate and store a master
+>  AEAD key `K`. Servers should additionally choose a non-secret, unique
+> 
+> And in general should be the same for all cookies generated by a given
+> server?
+
+Yes, until it is switched to the next 'K'.
+
+> Also, we should say that 'K' should (MUST?) not be used for any other
+> purpose.
+
+Do we really have to explicitly specify that for a secret key?
+Also, Section 6 is non-normative and contains general suggestions.
+Specific details are implementation dependent.
+
+>  periods prior.  Servers should continue to accept any cookie
+>  generated using keys that they have not yet erased, even if those
+> 
+> nit: "been erased"
+
+We think the text is correct as it is.
+
+>  function of its predecessor.  A recommended concrete implementation
+>  of this approach is to use HKDF [RFC5869] to derive new keys, using
+>  the key's predecessor as Input Keying Material and its key identifier
+>  as a salt.
+> 
+> Do we need to say to generate the appropriate amount of output material
+> from HKDF as needed for the next-generation key?  (I kind of hope not,
+> but...)
+
+Section 6 is non-normative and contains general suggestions. Specific
+details are implementation dependent.
+
+>  The cookie should consist of the tuple `(I,N,C)`.
+> 
+> Are 'I' and 'N' fixed-length or length-prefixed?
+
+(Same answer as above.)
+
+>  and nonce `N` with no associated data.  If decryption or verification
+>  fails, reply with an NTS NAK.  Otherwise, parse out the contents of
+> 
+> [same comment about RFC 5116 terminology]
+
+(Same answer as above.)
+
+> Section 7.2
+> 
+> In a similar vein as my comment on the
+> "EXPORTER-network-time-security/1" string, perhaps the "/1" is not
+> necessary here?
+
+Here too it is meant to be a version number.
+
+> Section 7.3
+> 
+> I will send a note to the TLS WG giving them a heads-up about the
+> "Recommended" value of "Y", though my sense is that this should be in
+> keeping with the spirit of recommended values.
+
+We have changed this to a "N" since that was our understanding was
+correct for this kind label, but almost immediately Rich asked why.
+If Rich and/or other knowledgeable persons are of another opinion,
+we will not oppose to change back.
+
+> Section 9
+> 
+> We should probably have some discussion of the consequences of
+> compromise of the server's cookie-encryption key.  Possibly also for
+> when the key associated with a cookie is compromised from a client,
+> though if cookies are single-use the scope may be quite limited.  (That
+> is, since we are using the shared symmetric key for authentication by
+> virtue of "I didn't send it so it must be from the other party that has
+> the key".)
+
+If a client gets its keys compromised, of any kind, there is a pretty
+clear path forward and no-one else is expected.
+### XXX ###
+(But there could be a point in writing something about what to expect
+When a server is compromised, how it should be handled and such?)
+Issue #134
+### XXX ###
+
+> Section 9.2
+> 
+>  NTS users should also consider that they are not fully protected
+>  against DDoS attacks by on-path adversaries.  In addition to dropping
+>  packets and attacks such as those described in Section 9.5, an on-
+>  path attacker can send spoofed kiss-o'-death replies, which are not
+>  authenticated, in response to NTP requests.  This could result in
+> 
+> Wouldn't these on-path attacks just be DoS attacks, not DDoS ones?
+
+Right, changed.
+
+>  significantly increased load on the NTS-KE server.  Implementers have
+>  to weigh the user's need for unlinkability against the added
+>  resilience that comes with cookie reuse in cases of NTS-KE server
+>  unavailability.
+> 
+> It's perhaps worth mentioning the requirement for kiss-o'-death replies
+> to echo the message identifier once a server is known to have sent valid
+> NTS-protected messages, which limits the scope of this attack to on-path
+> attackers.
+
+### XXX ###
+Issue #136
+### XXX ###
+
+> Section 9.3
+> 
+> It might be worth some discussion of the potential tradeoffs involved in
+> encoding a client IP address into a cookie, with respect to allowing for
+> some form of source-address validation (and thus protection against
+> serving as a DDoS reflector).  QUIC, for example, has facility for
+> encoding source-address validation state into cookie-like artifacts.
+> Such IP address recording comes with concordant privacy and tracking
+> considerations, though (hence "tradeoffs").
+
+This would prevent mobile clients from using stored cookies. In the
+end, it's an implementation issue.
+
+> Additionally, it seems that if the "NTP Server Negotiation" record is
+> optional for the client to send but can be set by the server, that would
+> result in some modest packet expansion, which would be topical to
+> mention here.
+
+The NTP Server Negotiation record is used by NTS-KE and is not an
+NTP extension field. There is no need to protect against packet
+expansion when using the TCP/TLS based NTS-KE part of NTS.
+
+> Section 9.5
+> 
+>  mitigate this attack.  However, the maximum error that an adversary
+>  can introduce is bounded by half of the round trip delay.
+> 
+> Half of the round-trip after the delay attack or in its absence?
+
+Half of the round-trip time after the delay attack. The round-trip
+time is typically limited to 1 second in many implementations.
+We have added a link to the referenced paper where this is explained.
+
+> Section 9.6
+> 
+>  At various points in NTS, the generation of cryptographically secure
+>  random numbers is required.  Whenever this draft specifies the use of
+> 
+> The string "random" appears only in the construction of the unique
+> identifier and the non-normative recommended cookie construction, and
+> the RFC 5116 recommended nonce construction also takes a random input;
+> do we want to mention specific examples instead of or in addition to
+> saying "various points"?  (I might consider mentioning that the SIV mode
+> helps reduce the dependence on strong random numbers as wel.)
+
+This section was removed and Section 5.7 updated to clarify this.
+
+> Section 9.7
+> 
+> Is there anything to say about a target end-state where some peers can
+> successfully require NTS for all connections (i.e., no fallback of any
+> sort)?
+> 
+>  For the reasons described here, implementations SHOULD NOT revert
+>  from NTS-protected to unprotected NTP with any server without
+>  explicit user action.
+> 
+> Which would then force a choice between tolerating bad time and reusing
+> cookies, until user action can be obtained?
+
+This is about not accepting a downgrade from NTS-protected to
+unprotected (traditional) NTP. Wether cookies are reused or not is
+another issue, and is only about unlinkability of the client vs
+resilience of the time link.
+
+> Section 10.1
+> 
+>  The unlinkability objective only holds for time synchronization
+>  traffic, as opposed to key exchange traffic.  This implies that it
+>  cannot be guaranteed for devices that function not only as time
+>  clients, but also as time servers (because the latter can be
+>  externally triggered to send authentication data).
+> 
+> Are we just talking about the TLS server certificate?
+
+Likely that was what was meant, but not necessarily, there are
+other ways, to identify a server, the time scale, for example.
+
+The text has been updated to better reflect this.
+
+> Section 12.1
+> 
+> I'm not sure that a normative reference is needed for "MUST NOT do this"
+> (to RFC 6874).
+
+Implementers are required to know about zone identifiers and how they
+are formatted in order to be able to detect them correctly if they
+are received. 
+> RFC 7507 seems used only in the definition of SCSV, which is itself
+> unused in the document.
+
+Right, removed now.
+
+> Section 12.2
+> 
+> Why is RFC 5280 only informative but RFC 6125 is normative?
+
+Changed to be normative.
+
+> The "SHALL" regarding HKDF usage in TLS 1.3 exporters would seem to make
+> RFC 5869 a normative reference per
+> https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/,
+> though in my opinion the RFC 8446 reference would suffice for that
+> usage.
+
+Changed to be normative.
+
+> Also, Daniel should update (or remove) the address in his Author entry.
+
+He has. :-)
