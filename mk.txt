@@ -33,15 +33,22 @@ On 2020-03-19 14:10, Mirja Kühlewind via Datatracker wrote:
 > need to define a maximum number of retries (to actually make it stop at some
 > point) and further given some recommendation for an appropriate rate limit
 > (e.g. initial retry after 3 seconds...?).
-> 
+
+The exact values of this are implementation and application dependent. What
+would be considered an acceptable value in one application may be unacceptable
+in another. Furthermore, specifying good and safe values for this would
+require operational experience that does not currently exist and probably will
+not exist until NTS has been in use for a long time.
+
 > 2) Sec 4.1.3: "      Error code 2 means "Internal Server Error".  The server
 > MUST
 >       respond with this error if it is unable to respond properly due to
 >       an internal condition."
 > At least for this error, I think you need to specify what the client should do
 > on reception. Retry? Immediately? How often? Or wait for a while?
-> 
-> 
+
+
+
 > ----------------------------------------------------------------------
 > COMMENT:
 > ----------------------------------------------------------------------
