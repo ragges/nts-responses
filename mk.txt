@@ -1,0 +1,84 @@
+
+
+On 2020-03-19 14:10, Mirja Kühlewind via Datatracker wrote:
+> Mirja Kühlewind has entered the following ballot position for
+> draft-ietf-ntp-using-nts-for-ntp-24: Discuss
+> 
+> When responding, please keep the subject line intact and reply to all
+> email addresses included in the To and CC lines. (Feel free to cut this
+> introductory paragraph, however.)
+> 
+> 
+> Please refer to https://www.ietf.org/iesg/statement/discuss-criteria.html
+> for more information about IESG DISCUSS and COMMENT positions.
+> 
+> 
+> The document, along with other ballot positions, can be found here:
+> https://datatracker.ietf.org/doc/draft-ietf-ntp-using-nts-for-ntp/
+> 
+> 
+> 
+> ----------------------------------------------------------------------
+> DISCUSS:
+> ----------------------------------------------------------------------
+> 
+> Two rather small and hopefully quick-to-address points that I think must be
+> clarified before publication of this spec:
+> 
+> 1) Sec 5.7: "In that
+>    case, it MUST be able to detect and stop looping between the NTS-KE
+>    and NTP servers by rate limiting the retries using e.g. exponential
+>    retry intervals."
+> Yes, rate limiting and exponential back-off is good here. However, you anyway
+> need to define a maximum number of retries (to actually make it stop at some
+> point) and further given some recommendation for an appropriate rate limit
+> (e.g. initial retry after 3 seconds...?).
+> 
+> 2) Sec 4.1.3: "      Error code 2 means "Internal Server Error".  The server
+> MUST
+>       respond with this error if it is unable to respond properly due to
+>       an internal condition."
+> At least for this error, I think you need to specify what the client should do
+> on reception. Retry? Immediately? How often? Or wait for a while?
+> 
+> 
+> ----------------------------------------------------------------------
+> COMMENT:
+> ----------------------------------------------------------------------
+> 
+> In addition to Ben's discuss point on ports which I would also like to see the
+> answer to, one more question: My understanding is that the TCP port (123) for
+> NTP is not used and will likely never be used in future. Why are you not using
+> that port for NTS-KE, as NTS-KE is using TCP?
+> 
+> A couple more small questions:
+> 1) Sec 4.1.3:
+> "The Critical Bit MUST be set."
+> If you set the Critical Bit for error records, that would only mean that a
+> receiver could send another error in response to that error which again has the
+> critical bit set which then could cause another error, and it would go on
+> forever. Yes, this case should never happen as all its-ke implementations must
+> support error records but maybe it's safer to just not set the critical bit?
+> 
+> 2) Sec 4.1.4: I don't really understand the idea of the Warning record. There
+> are no code points defined and there is no explanation given what this could be
+> used for. Especially what should a client do that received a warning? Why is
+> the error record not sufficient?
+> 
+> 3) Sec 4.1.5: "   If the NTS Next Protocol Negotiation record offers Protocol
+> ID 0 (for
+>    NTPv4), then this record MUST be included exactly once. "
+> In this case, I guess the critical bit should/MUST be also set to 1?
+> 
+> 4) Sec 5.7:
+> "1280 octets is
+>    the minimum prescribed MTU for IPv6 and is in practice also safe for
+>    avoiding IPv4 fragmentation.  Nonetheless, senders SHOULD include
+>    fewer cookies and placeholders than otherwise indicated if doing so
+>    is necessary to prevent fragmentation."
+> RFC8085 says "For IPv4, EMTU_S is the smaller of 576 bytes and the
+>    first-hop MTU [RFC1122]."
+> Maybe it would be appropriate to note that.
+> 
+> 
+> 
