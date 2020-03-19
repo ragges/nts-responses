@@ -1,4 +1,10 @@
+Hi Mirja!
 
+Thank you for your work in reviewing the draft. We have carefully gone over all
+your comments and DISCUSS points. Each of them is addressed below.
+
+Kind regards,
+Marcus Dansarie
 
 On 2020-03-19 14:10, Mirja Kühlewind via Datatracker wrote:
 > Mirja Kühlewind has entered the following ballot position for
@@ -93,8 +99,8 @@ significantly simplified.
 > In this case, I guess the critical bit should/MUST be also set to 1?
 
 The reason for why the AEAD Algorithm Negotiation critical bit MAY be set,
-instead of SHOULD/MUST be set is to ensure compatibility with future protocols
-which use NTS-KE, but not the AEAD Algorithm Negotiation record.
+instead of SHOULD/MUST, is to ensure compatibility with future protocols which
+use NTS-KE, but not the AEAD Algorithm Negotiation record.
 
 As an example, consider a hypothetical future Hyper Rocket Toaster Time
 Transfer Protocol (HRTTTP) which uses NTS-KE, but utilizes some different (and
@@ -104,9 +110,9 @@ Next Protocol Negotiation record. If the client, for example, sends protocol ID
 0 (NTPv4) and the protocol ID for HRTTTP, it must include the required other
 records for both protocols. If the client sets the Critical Bit of the AEAD
 Algorithm Negotiation record in this case, the server MUST respond with error
-code 0 and the negotiation will fail, even though it is syntactically correct
-and it would have been entirely possible for it to successfully respond with
-HRTTTP cookies.
+code 0 and the negotiation will fail, even though it is semantically correct
+and it would have been entirely possible for the server to successfully respond
+with HRTTTP cookies.
 
 > 4) Sec 5.7:
 > "1280 octets is
@@ -118,6 +124,6 @@ HRTTTP cookies.
 >    first-hop MTU [RFC1122]."
 > Maybe it would be appropriate to note that.
 
-This issue was brought by Suresh in his AD review. We then elected to keep the
-current text as is, since it refers to the general case, rather than the strict
-requirements of RFC 1122.
+This issue was brought up by Suresh in his AD review. We then elected to keep
+the current text as is, since it refers to the general case, rather than the
+strict requirements of RFC 1122.
