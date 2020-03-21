@@ -91,13 +91,14 @@ On 19 Mar 2020, at 22:21, Benjamin Kaduk <kaduk@MIT.EDU> wrote:
 ### XXX ###
 Issue #172
 
-We have added a text that implementations must obey the rules in
-RFC 5280 and RFC 6125 and that we recommend the use of DNS-ID,
-and hope this will suffice.
+We have added a paragraph about that implementations must obey the
+rules in RFC 5280 and RFC 6125 and that we recommend the use of
+DNS-ID, and hope this will suffice.
 
 We would like to again emphasise that service discovery and the
 related server verification is a subject currently being worked
-on in the WG.
+on in the WG, we expect additions to this.
+
 ### XXX ###
 
 > > > In a related vein, if ALPN is necessary for confirming ntske operation,
@@ -167,7 +168,8 @@ on in the WG.
 > I think that using "can" would avoid any risk of misunderstanding as
 > "sometimes possible" vs. "at their option"
 
-We finally got your point, and have changed them to "can" now. Thanks!
+This time we got your point, and have now changed them to "can".
+Thanks!
 
 > > >  o  Unlinkability: For mobile clients, NTS will not leak any
 > > >     information additional to NTP which would permit a passive
@@ -263,9 +265,9 @@ We finally got your point, and have changed them to "can" now. Thanks!
 > though.
 
 This and other issues showed that keeping 1.2 support would have
-required handling several special cases and considerations for the
-use of 1.2 vs >=1.3. It would also risk getting any of them wrong,
-or missing some, in the specification or the implementations.
+required handling several special cases and considerations for the use
+of 1.2 vs >=1.3. It would also risk getting any of them wrong, or
+missing some, in the specification or the implementations.
 
 We have now removed support for 1.2 and require >=1.3.
 A big step, but it is now or never.
@@ -331,11 +333,11 @@ supporting 1.3. This is inconvenient, but doable.
 > (should any groundbreaking extensions appear), but I cannot insist on a
 > change here.
 
-Since the protocol currently only supports a single request which gets a
-single reply, this should not be a problem until someone makes changes
-to do more interactions per session. We opted to not change this now,
-since this would be a larger change that should be thought through,
-and that can be handled by that future change.
+Since the protocol currently only supports a single request which gets
+a single reply, this should not be a problem until someone makes
+changes to do more interactions per session. We opted to not change
+this now, since this would be a larger change that should be well
+thought through, and since this can be handled by that future change.
 
 > > >  For clarity regarding bit-endianness: the Critical Bit is the most-
 > > >  significant bit of the first octet.  In C, given a network buffer
@@ -436,7 +438,7 @@ and that can be handled by that future change.
 > prettier identifiers for the initial batch of time.
 
 Right, and this also seems to be the contemporary way of doing it.
-We opted to do this change now. Thanks for the suggestion!
+We changed this. Again, now or never. Thanks for the suggestion!
 
 > > > Section 5.1
 > > > 
@@ -662,9 +664,9 @@ We opted to do this change now. Thanks for the suggestion!
 > 
 > Fair enough.
 
-Since we can't describe and explicitly forbid every possible way
+Since this is just one of probably an infinite set of ways that
 someone could make bad decisions in their designs, and since this is
-not part of the NTS protocol, we opted to not changes this.
+not part of the NTS protocol, we decided to not changes this.
 
 We added an extra "secret" before "key K" in the text though, to
 emphasise that it is.
@@ -857,26 +859,26 @@ about implementation and application.
 > I expect most people to choose the last one, but perhaps in some cases the
 > first one would be preferred.
 
-The client MUST only accept responses that are authentic under
-the S2C key associated with the corresponding request.
+The client MUST only accept responses that are authentic under the S2C
+key associated with the corresponding request.
 
-So stripping of NTS extensions from the NTP response (or sending
-a fake response) should (=MUST) just lead to the client
-discarding the response without further processing.
+So stripping of NTS extensions from the NTP response (or sending a
+fake response) should (=MUST) just lead to the client discarding the
+response without further processing.
 
-We added a more explicit text in "Protocol Details" to emphasise
-this: "The client MUST NOT accept unprotected responses to
-NTS-protected requests.".
+We added a more explicit text in "Protocol Details" to emphasise this:
+"The client MUST NOT accept unprotected responses to NTS-protected
+requests.".
 
-We also changed a word in "NTS Stripping" to make it more clear
-that this should not be possible to do.
+We also changed a word in "NTS Stripping" to make it more clear that
+this should not be possible to do.
 
-If the attacker can block the KE server traffic, it could likely
-block any traffic, and then the client could find itself without
-time service or any other service, with or without NTS.
-(We would love to be able to solve this, it would fix so many
-things, from attacks to broken cables, we regret to say that
-NTS is not the answer to this.)
+If the attacker can block the KE server traffic, it could likely block
+any traffic, and then the client could find itself without time
+service or any other service, with or without NTS.
+(We would love to be able to solve this though, it would fix so many
+things, from attacks to broken cables, we regret to say that NTS is
+not the answer to this.)
 
 > > > Section 10.1
 > > > 
