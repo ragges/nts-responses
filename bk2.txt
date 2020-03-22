@@ -88,18 +88,9 @@ On 19 Mar 2020, at 22:21, Benjamin Kaduk <kaduk@MIT.EDU> wrote:
 > designers as to how to select the type of identifier to be used for their
 > protocol.
 
-### XXX ###
-Issue #172
-
 We have added a paragraph about that implementations must obey the
 rules in RFC 5280 and RFC 6125 and that we recommend the use of
-DNS-ID, and hope this will suffice.
-
-We would like to again emphasise that service discovery and the
-related server verification is a subject currently being worked
-on in the WG, we expect additions to this.
-
-### XXX ###
+DNS-ID, and hope this will suffice for now.
 
 > > > In a related vein, if ALPN is necessary for confirming ntske operation,
 > > > it's not entirely clear to me that a dedicated port (in addition to
