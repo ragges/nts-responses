@@ -2,7 +2,10 @@
 Hello Mirja,
 
 Thank you again for your work on reviewing the draft.
-Here are some updates from the latest draft.
+Here is an update from the latest draft.
+
+Best regards,
+Ragnar
 
 On 19 Mar 2020, at 18:41, Marcus Dansarie <marcus@dansarie.se> wrote:
 > Hi Mirja!
@@ -53,7 +56,8 @@ On 19 Mar 2020, at 18:41, Marcus Dansarie <marcus@dansarie.se> wrote:
 > for this would require operational experience that does not currently
 > exist and probably will not exist until NTS has been in use for a long time.
 
-We have added some more recommendations in the latest version.
+We have added some more recommendations in the latest version (third
+paragraph from the end in Section 5.7).
 
 > > 2) Sec 4.1.3: "      Error code 2 means "Internal Server Error".  The server MUST
 > >       respond with this error if it is unable to respond properly due to
@@ -136,4 +140,3 @@ We have added some more recommendations in the latest version.
 > This issue was brought up by Suresh in his AD review. We then elected to
 > keep the current text as is, since it refers to the general case, rather
 > than the strict requirements of RFC 1122.
-
